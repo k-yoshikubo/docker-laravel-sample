@@ -1,0 +1,29 @@
+version: "3.5"
+services:
+    app:
+        build:
+            context: ./docker/php
+            args:
+                - TZ=${TZ}
+        volumes:
+            - ./src:/work
+            - ./logs:/var/log/php
+            - ./docker/php/php.ini:/usr/local/etc/php/php.ini
+        working_dir: /work
+        environment:
+            - DB_CONNECTION=mysql
+            - DB_HOST=db
+            - DB_DATABASE=${DB_NAME}
+            - DB_USERNAME=${DB_USER}
+            - DB_PASSWORD=${DB_PASS}
+            - TZ=${TZ}
+networks:
+    # docker-composeで勝手にデフォルトネットワークが生成される予防。（自動で全コンテナが所属するbridgeを指定）
+    default:
+        external:
+        name: bridge
+    # コンテナ間通信用のネットワークセグメント
+    container-link:
+        # これが作成されるネットワーク名（同名がなければ自動生成される）
+        name: docker.internal
+
